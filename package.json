@@ -1,5 +1,5 @@
 {
-  "name": "my-next-app",
+  "name": "cloudflarer2-next",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,9 +13,13 @@
     "pages:dev": "npx wrangler pages dev .vercel/output/static --compatibility-flag=nodejs_compat"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.14.10",
     "@types/node": "20.6.3",
     "@types/react": "18.2.22",
     "@types/react-dom": "18.2.7",
+    "axios": "^1.5.0",
     "eslint": "8.49.0",
     "eslint-config-next": "13.5.2",
     "next": "13.5.2",
