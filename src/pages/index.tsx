@@ -1,12 +1,25 @@
 import styles from "@/styles/Home.module.css";
-import { Card, CardContent } from "@mui/material";
+import { Alert, Card, CardContent, Snackbar } from "@mui/material";
 import axios from "axios";
 import { Inter } from "next/font/google";
 import Head from "next/head";
+import { useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
+  const [open, setOpen] = useState(false);
+
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
   return (
     <>
       <Head>
@@ -54,6 +67,7 @@ export default function Home() {
                             "🚀 ~ file: index.tsx:42 ~ .then ~ response:",
                             response
                           );
+                          setOpen(true);
                         })
                         .catch((err) => {
                           console.log(
@@ -62,24 +76,6 @@ export default function Home() {
                           );
                         });
                     };
-                    // axios
-                    //   .put(response.data, selectedFile, {
-                    //     headers: {
-                    //       "Content-Type": selectedFile.type,
-                    //     },
-                    //   })
-                    //   .then((response) => {
-                    //     console.log(
-                    //       "🚀 ~ file: index.tsx:42 ~ .then ~ response:",
-                    //       response
-                    //     );
-                    //   })
-                    //   .catch((err) => {
-                    //     console.log(
-                    //       "🚀 ~ file: index.tsx:43 ~ .then ~ err:",
-                    //       err
-                    //     );
-                    //   });
                   })
                   .catch((err) => {
                     console.log(err);
@@ -88,6 +84,15 @@ export default function Home() {
             />
           </CardContent>
         </Card>
+        <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
+          <Alert
+            onClose={handleClose}
+            severity="success"
+            sx={{ width: "100%" }}
+          >
+            File uploaded successfully!
+          </Alert>
+        </Snackbar>
       </main>
     </>
   );
