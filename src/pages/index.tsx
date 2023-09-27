@@ -4,6 +4,7 @@ import axios from "axios";
 import { Inter } from "next/font/google";
 import Head from "next/head";
 import { useState } from "react";
+import uploadFile from "../../common/splitfile";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -35,51 +36,7 @@ export default function Home() {
               type="file"
               onChange={(e) => {
                 const selectedFile = e.target?.files?.[0] as File;
-
-                axios
-                  .put(
-                    `https://cloudflare.usman-bestdev.workers.dev/${selectedFile?.name}`,
-                    null,
-                    {
-                      headers: {
-                        "Access-Control-Allow-Origin": "*",
-                        "Access-Control-Allow-Headers": "*",
-                        "Access-Control-Allow-Credentials": "true",
-                      },
-                    }
-                  )
-                  .then((response) => {
-                    var r = new FileReader();
-                    r.readAsArrayBuffer(selectedFile);
-
-                    r.onload = function () {
-                      axios
-                        .put(response.data, r.result, {
-                          headers: {
-                            "Content-Type": selectedFile.type,
-                            "Access-Control-Allow-Origin": "*",
-                            "Access-Control-Allow-Headers": "*",
-                            "Access-Control-Allow-Credentials": "true",
-                          },
-                        })
-                        .then((response) => {
-                          console.log(
-                            "🚀 ~ file: index.tsx:42 ~ .then ~ response:",
-                            response
-                          );
-                          setOpen(true);
-                        })
-                        .catch((err) => {
-                          console.log(
-                            "🚀 ~ file: index.tsx:43 ~ .then ~ err:",
-                            err
-                          );
-                        });
-                    };
-                  })
-                  .catch((err) => {
-                    console.log(err);
-                  });
+                uploadFile(selectedFile);
               }}
             />
           </CardContent>
