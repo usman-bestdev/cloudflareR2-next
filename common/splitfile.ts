@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import axios from "axios";
 
-const workerEndpoint = "https://cloudflare.usman-bestdev.workers.dev/";
+export const workerEndpoint = "https://cloudflare.usman-bestdev.workers.dev/";
 const partSize = 10 * 1024 * 1024; // 1MB
 
 const uploadFile = async (selectedFile: File) => {
@@ -45,6 +45,7 @@ const uploadFile = async (selectedFile: File) => {
 
   if (completeResponse.status === 200) {
     console.log("🎉 Successfully completed multipart upload");
+    return completeResponse.status;
   } else {
     console.error(completeResponse.data);
   }

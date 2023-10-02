@@ -1,16 +1,46 @@
 import styles from "@/styles/Home.module.css";
-import { Alert, Card, CardContent, Snackbar } from "@mui/material";
-import axios from "axios";
+import {
+  Alert,
+  Box,
+  Card,
+  CardContent,
+  LinearProgress,
+  Paper,
+  Snackbar,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import { Inter } from "next/font/google";
 import Head from "next/head";
-import { useState } from "react";
-import uploadFile from "../../common/splitfile";
+import { useEffect, useState } from "react";
+import { getList, postList } from "../../common/kv";
+import uploadFile, { workerEndpoint } from "../../common/splitfile";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
   const [open, setOpen] = useState(false);
+  const [fileName, setFileName] = useState("");
+  const [rows, setRows] = useState<string[]>([]);
+  const [selectedRow, setSelectedRow] = useState<Boolean>(false);
+  const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    getData();
+  }, []);
+
+  async function getData() {
+    let list = await getList();
+    setRows(list.data);
+  }
+  async function postData(file: string) {
+    let value = await postList(file);
+    if (value?.status == 200) getData();
+  }
   const handleClose = (
     event?: React.SyntheticEvent | Event,
     reason?: string
@@ -32,15 +62,78 @@ export default function Home() {
       <main className={`${styles.main} ${inter.className}`}>
         <Card>
           <CardContent>
+            {loading && <LinearProgress />}
             <input
               type="file"
-              onChange={(e) => {
+              onChange={async (e) => {
                 const selectedFile = e.target?.files?.[0] as File;
-                uploadFile(selectedFile);
+                setSelectedRow(false);
+                setLoading(true);
+                let file = await uploadFile(selectedFile);
+                if (file) {
+                  setFileName(selectedFile.name);
+                  setOpen(true);
+                  setLoading(false);
+                  postData(selectedFile.name);
+                }
               }}
             />
           </CardContent>
         </Card>
+        <Box width={"100%"} display={"flex"}>
+          <Box>
+            <TableContainer component={Paper}>
+              <Table sx={{ minWidth: 650 }}>
+                <TableHead sx={{ bgcolor: "grey" }}>
+                  <TableRow>
+                    <TableCell>Uploaded Files</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {rows.map((row, index) => (
+                    <TableRow
+                      key={index}
+                      sx={{
+                        "&:last-child td, &:last-child th": { border: 0 },
+                        cursor: "pointer",
+                      }}
+                    >
+                      <TableCell
+                        component="th"
+                        scope="row"
+                        onClick={() => {
+                          setFileName(row);
+                          setSelectedRow(true);
+                        }}
+                      >
+                        {row}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Box>
+          <Box width={"50%"} height={"500px"}>
+            {open && (
+              <img
+                src={`${workerEndpoint}${fileName}?action=get`}
+                width={500}
+                height={500}
+                alt="Picture of the author"
+              />
+            )}
+            {selectedRow && (
+              <img
+                src={`${workerEndpoint}${fileName}?action=get`}
+                width={500}
+                height={500}
+                alt="Picture of the author"
+              />
+            )}
+          </Box>
+        </Box>
+
         <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
           <Alert
             onClose={handleClose}
